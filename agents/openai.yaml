@@ -1,0 +1,4 @@
+interface:
+  display_name: "Clash Domain Routing"
+  short_description: "Route domains direct or via proxy in Clash."
+  default_prompt: "Use $clash-domain-routing to configure direct or forced-proxy routing for specific domains in Clash Verge."
