@@ -41,7 +41,11 @@ It covers:
 
 ### Prompt to Send to an AI Agent
 
-Send a prompt like this:
+Recommended prompt:
+
+> Use `$clash-domain-routing` from `https://github.com/edisoncccc/clash-domain-routing-skill` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
+
+If the skill is already installed locally, this shorter form is also fine:
 
 > Use `$clash-domain-routing` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
 
