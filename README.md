@@ -77,8 +77,8 @@ If the skill is already installed locally, this shorter form is also fine:
 
 ### 使用示例
 
-- 让 `portal.abc.com` 在开启 TUN 时仍保持直连（可理解为本地/内网站点示例）
-- 让 `media.bcd.org` 强制走 `MAIN-PROXY`（可理解为经常被通用规则漏掉或误分流的公网网站示例）
+- 让 `portal.abc.com` 在开启 TUN 时仍保持直连，可理解为本地或内网站点示例
+- 让 `media.bcd.org` 强制走 `MAIN-PROXY`，可理解为经常被通用规则漏掉或误分流的公网网站示例
 - 只改一个子域名的路径，其他同级域名保持原来的直连策略
 
 ### 安装方法
@@ -98,7 +98,11 @@ If the skill is already installed locally, this shorter form is also fine:
 
 ### 发给 AI Agent 的调用文案
 
-可以直接发这段：
+推荐写法：
+
+> Use `$clash-domain-routing` from `https://github.com/edisoncccc/clash-domain-routing-skill` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
+
+如果 skill 已经安装在本地，也可以直接发简写版本：
 
 > Use `$clash-domain-routing` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
 
@@ -107,3 +111,5 @@ If the skill is already installed locally, this shorter form is also fine:
 - 对于内网域名或分视图 DNS 场景，只写 `DIRECT` 往往不够。
 - 只要 DNS 行为相关，通常要把 `fake-ip-filter` 和 `nameserver-policy` 一起考虑。
 - 尽量使用稳定的代理组名，不要绑定容易变化的订阅节点名。
+- 如果关掉 TUN 可以访问、开了 TUN 反而失败，要检查 Mihomo 的直连出站是不是切到了错误接口。
+- 在 Clash Verge 的 merge 片段里，要小心顶层 `proxies:` 覆盖；它可能把 `clash-verge-check.yaml` 里的 `自动` 组搞坏。
