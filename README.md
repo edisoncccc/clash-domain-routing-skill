@@ -43,11 +43,11 @@ It covers:
 
 Recommended prompt:
 
-> Use `$clash-domain-routing` from `https://github.com/edisoncccc/clash-domain-routing-skill` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
+> 使用 `$clash-domain-routing`，来源是 `https://github.com/edisoncccc/clash-domain-routing-skill`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过 logs 验证是否生效。
 
 If the skill is already installed locally, this shorter form is also fine:
 
-> Use `$clash-domain-routing` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
+> 使用 `$clash-domain-routing`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过 logs 验证是否生效。
 
 ### Notes
 
@@ -100,11 +100,11 @@ If the skill is already installed locally, this shorter form is also fine:
 
 推荐写法：
 
-> Use `$clash-domain-routing` from `https://github.com/edisoncccc/clash-domain-routing-skill` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
+> 使用 `$clash-domain-routing`，来源是 `https://github.com/edisoncccc/clash-domain-routing-skill`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过 logs 验证是否生效。
 
 如果 skill 已经安装在本地，也可以直接发简写版本：
 
-> Use `$clash-domain-routing` to configure Clash Verge so one domain stays direct under TUN and another selected site always goes through my proxy group. Check whether I also need `fake-ip-filter` or `nameserver-policy`, then show the exact config fragment and how to verify it from logs.
+> 使用 `$clash-domain-routing`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过 logs 验证是否生效。
 
 ### 说明
 
