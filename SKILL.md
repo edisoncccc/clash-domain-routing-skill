@@ -13,6 +13,7 @@ Control per-domain traffic paths in Clash and Clash Verge. Use explicit domain r
 
 - Use `DOMAIN` or `DOMAIN-SUFFIX` with `DIRECT` when a domain must stay on the local or internal path.
 - Add `fake-ip-filter` and `nameserver-policy` when the domain depends on internal DNS, split-horizon DNS, or breaks under TUN with fake-ip.
+- If the same machine switches between office LAN and home VPN, prefer a scene-aware design: keep the base rule on `DIRECT`, and only add interface-bound DNS or `direct` proxies when the VPN adapter is actually required.
 - Use `DOMAIN` or `DOMAIN-SUFFIX` with a proxy group such as `MAIN-PROXY`, `PROXY`, or a VPN-capable select group when a site must always exit through the tunnel.
 - Prefer process rules only when the routing requirement is app-specific rather than domain-specific.
 
@@ -76,8 +77,11 @@ rules:
    - This means `DIRECT` inside TUN is still Clash opening the outbound socket, not the app bypassing Clash entirely.
 6. For split-DNS or VPN-only DNS, bind the DNS server to the intended interface when needed, for example:
    - `10.1.54.50#OpenVPN Data Channel Offload`
-7. If a forced-proxy site still leaks direct traffic, verify the exact host in logs and add a narrower `DOMAIN` rule above the suffix rule.
-8. Re-test with TUN enabled after every routing change.
+7. Do not hardcode a VPN-bound `direct` path as the only long-term answer if the laptop alternates between office and home:
+   - In office, plain `DIRECT` plus internal DNS is often enough.
+   - At home, only enable VPN-bound routing when the VPN adapter is truly connected.
+8. If a forced-proxy site still leaks direct traffic, verify the exact host in logs and add a narrower `DOMAIN` rule above the suffix rule.
+9. Re-test with TUN enabled after every routing change.
 
 ## TUN and VPN Edge Case
 
@@ -111,6 +115,11 @@ rules:
 ```
 
 If DNS is fixed but direct TCP still uses the wrong interface, use a dedicated `direct` proxy with `interface-name` and route the domain to that proxy instead of plain `DIRECT`.
+
+If the machine moves between office LAN and home VPN, keep both patterns available instead of forcing one universal static config:
+
+- Office scene: `DIRECT` plus internal DNS such as `10.1.54.50`
+- Home scene: keep the same direct rule, but add interface-bound DNS or a dedicated `direct` proxy only while the VPN adapter is connected
 
 ## Common Mistakes
 

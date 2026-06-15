@@ -35,6 +35,34 @@ dns:
 
 Use this when TUN-off access works but TUN-on access still fails even after adding `DIRECT`.
 
+If the same laptop alternates between office and home, do not leave the VPN-bound variant enabled all the time. A practical split is:
+
+- Office scene:
+
+```yaml
+dns:
+  nameserver-policy:
+    "+.local-portal.example":
+      - 10.1.54.50
+
+rules:
+  - DOMAIN-SUFFIX,local-portal.example,DIRECT
+```
+
+- Home scene with VPN connected:
+
+```yaml
+dns:
+  nameserver-policy:
+    "+.local-portal.example":
+      - "10.1.54.50#OpenVPN Data Channel Offload"
+
+rules:
+  - DOMAIN-SUFFIX,local-portal.example,DIRECT
+```
+
+Only add a dedicated `DIRECT-VPN` style proxy when plain `DIRECT` still dials through the wrong interface under TUN.
+
 ## Force a Site Through Proxy or VPN
 
 Use this when a public site must always go through the tunnel path.
@@ -94,3 +122,4 @@ If that happens:
 3. Confirm `fake-ip-filter` and `nameserver-policy` are present for internal domains.
 4. Open the target site with TUN enabled.
 5. Re-read the latest sidecar or core log and confirm the expected match.
+6. If the machine changes network scenes often, verify whether the VPN adapter is actually connected before trusting any interface-bound rule.
