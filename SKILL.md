@@ -62,6 +62,28 @@ rules:
   - DOMAIN-SUFFIX,example.com,DIRECT
 ```
 
+### 4. Prefer one authoritative internal DNS when it already answers both public and internal hosts correctly
+
+If the same internal DNS server already returns public IPs for some hosts and internal IPs for others under the same parent domain, do not add an external resolver just for the public hosts.
+
+```yaml
+dns:
+  fake-ip-filter:
+    - "*.example.net"
+    - "+.example.net"
+    - "example.net"
+  nameserver-policy:
+    "+.example.net":
+      - 10.1.54.50
+
+rules:
+  - DOMAIN,www.example.net,DIRECT
+  - DOMAIN,ssob.example.net,DIRECT
+  - DOMAIN-SUFFIX,example.net,DIRECT
+```
+
+This is safer than splitting `www.example.net` to a hardcoded public DNS such as `223.6.6.6` when the corporate or VPN-side DNS is already authoritative enough for both views.
+
 ## Diagnostic Workflow
 
 1. Inspect the merged runtime config first, not only fragment files or UI settings.
@@ -80,8 +102,9 @@ rules:
 7. Do not hardcode a VPN-bound `direct` path as the only long-term answer if the laptop alternates between office and home:
    - In office, plain `DIRECT` plus internal DNS is often enough.
    - At home, only enable VPN-bound routing when the VPN adapter is truly connected.
-8. If a forced-proxy site still leaks direct traffic, verify the exact host in logs and add a narrower `DOMAIN` rule above the suffix rule.
-9. Re-test with TUN enabled after every routing change.
+8. If an exact-host DNS override still shows `couldn't find ip`, verify whether the internal DNS already returns the correct public answer before adding any external resolver.
+9. If a forced-proxy site still leaks direct traffic, verify the exact host in logs and add a narrower `DOMAIN` rule above the suffix rule.
+10. Re-test with TUN enabled after every routing change.
 
 ## TUN and VPN Edge Case
 
@@ -127,6 +150,7 @@ If the machine moves between office LAN and home VPN, keep both patterns availab
 - Add `DIRECT` without excluding the domain from fake-ip when the domain depends on internal DNS answers.
 - Hardcode a subscription node name instead of a stable proxy group.
 - Edit only a source fragment and forget to verify the merged runtime config.
+- Force a public subdomain to an external DNS server even though the internal DNS already returns the correct public record. This often looks cleaner on paper but can fail inside corporate networks or under TUN.
 - Add a top-level `proxies:` block in a Clash Verge merge fragment without checking how it merges. This can replace the subscription proxy list in `clash-verge-check.yaml`, empty the `url-test` group `自动`, and trigger `proxy group[0]: 🔄 自动: 'use' or 'proxies' missing`.
 - Assume TUN `DIRECT` means the request follows the same system path as TUN off. Under Mihomo it still means Clash is doing a direct outbound dial, which may follow the wrong interface unless DNS and interface binding are both correct.
 

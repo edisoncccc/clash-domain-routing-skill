@@ -63,6 +63,8 @@ rules:
 
 Only add a dedicated `DIRECT-VPN` style proxy when plain `DIRECT` still dials through the wrong interface under TUN.
 
+If the same internal DNS already returns public answers for some hosts and internal answers for others under the same parent domain, prefer keeping the whole parent domain on that single DNS source instead of sending a few hosts to an external resolver. This avoids cases where Mihomo can log `using DIRECT` for the DNS server but still returns `couldn't find ip` in a corporate network.
+
 ## Force a Site Through Proxy or VPN
 
 Use this when a public site must always go through the tunnel path.
@@ -90,6 +92,8 @@ rules:
 
 Place the exact-host rule first.
 
+If the exact host should still use the same split-DNS authority as the parent domain, do not add a separate public `nameserver-policy` entry just because the host is public-facing. Verify the internal DNS answer first.
+
 ## Log Interpretation
 
 - `match DomainSuffix(local-portal.example) using DIRECT`
@@ -100,6 +104,8 @@ Place the exact-host rule first.
   - TUN direct traffic may now dial against the WLAN path unless DNS and direct egress are explicitly aligned with the VPN interface.
 - `match DomainSuffix(media-hub.example) using MAIN-PROXY[...]`
   - The site was forced into the configured proxy group.
+- `dial DIRECT (match Domain/www.example.net) ... dns resolve failed: couldn't find ip`
+  - The exact-host rule matched, but the chosen DNS path did not return an answer. Check whether an external resolver override is actually needed.
 
 ## Clash Verge Merge Warning
 
@@ -123,3 +129,4 @@ If that happens:
 4. Open the target site with TUN enabled.
 5. Re-read the latest sidecar or core log and confirm the expected match.
 6. If the machine changes network scenes often, verify whether the VPN adapter is actually connected before trusting any interface-bound rule.
+7. If a public subdomain fails only after adding a host-specific DNS override, test the same host directly against the internal DNS server before keeping that override.
