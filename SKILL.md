@@ -16,6 +16,7 @@ Control per-domain traffic paths in Clash and Clash Verge. Use explicit domain r
 - If the same machine switches between office LAN and home VPN, prefer a scene-aware design: keep the base rule on `DIRECT`, and only add interface-bound DNS or `direct` proxies when the VPN adapter is actually required.
 - Use `DOMAIN` or `DOMAIN-SUFFIX` with a proxy group such as `MAIN-PROXY`, `PROXY`, or a VPN-capable select group when a site must always exit through the tunnel.
 - Prefer process rules only when the routing requirement is app-specific rather than domain-specific.
+- When a laptop alternates between office LAN and home VPN, maintain two reviewed scene snapshots and switch only the route/DNS fragments required by each network.
 
 ## Core Patterns
 
@@ -31,7 +32,7 @@ dns:
     - "local-portal.example"
   nameserver-policy:
     "+.local-portal.example":
-      - 10.1.54.50
+      - 192.0.2.53
 
 rules:
   - DOMAIN-SUFFIX,local-portal.example,DIRECT
@@ -39,6 +40,7 @@ rules:
 
 Use this pattern when `DIRECT` alone is not enough under TUN.
 Think of `local-portal.example` as a placeholder for an internal or local website that depends on the right DNS path.
+`192.0.2.53` is a documentation-only address; replace it with the internal DNS server for the target network.
 
 ### 2. Force a public site through the proxy or VPN path
 
@@ -74,7 +76,7 @@ dns:
     - "example.net"
   nameserver-policy:
     "+.example.net":
-      - 10.1.54.50
+      - 192.0.2.53
 
 rules:
   - DOMAIN,www.example.net,DIRECT
@@ -98,7 +100,7 @@ This is safer than splitting `www.example.net` to a hardcoded public DNS such as
    - `[TUN] default interface changed by monitor, => WLAN`
    - This means `DIRECT` inside TUN is still Clash opening the outbound socket, not the app bypassing Clash entirely.
 6. For split-DNS or VPN-only DNS, bind the DNS server to the intended interface when needed, for example:
-   - `10.1.54.50#OpenVPN Data Channel Offload`
+   - `"192.0.2.53#Your VPN Adapter Name"`
 7. Do not hardcode a VPN-bound `direct` path as the only long-term answer if the laptop alternates between office and home:
    - In office, plain `DIRECT` plus internal DNS is often enough.
    - At home, only enable VPN-bound routing when the VPN adapter is truly connected.
@@ -131,7 +133,7 @@ dns:
     - "local-portal.example"
   nameserver-policy:
     "+.local-portal.example":
-      - "10.1.54.50#OpenVPN Data Channel Offload"
+      - "192.0.2.53#Your VPN Adapter Name"
 
 rules:
   - DOMAIN-SUFFIX,local-portal.example,DIRECT
@@ -141,8 +143,45 @@ If DNS is fixed but direct TCP still uses the wrong interface, use a dedicated `
 
 If the machine moves between office LAN and home VPN, keep both patterns available instead of forcing one universal static config:
 
-- Office scene: `DIRECT` plus internal DNS such as `10.1.54.50`
+- Office scene: `DIRECT` plus internal DNS such as `192.0.2.53`
 - Home scene: keep the same direct rule, but add interface-bound DNS or a dedicated `direct` proxy only while the VPN adapter is connected
+
+## Home and Office Scene Switching
+
+Use scenes when the same internal domain needs different DNS/interface behavior on office LAN and home VPN. This is a configuration deployment problem, not a rule-order workaround.
+
+1. Create `home` and `office` snapshot folders outside the Clash Verge runtime directory.
+2. In each snapshot, keep only the reviewed customization files: `Script.js`, `Merge.yaml`, and `dns_config.yaml`.
+3. Keep `DIRECT` rules consistent across both scenes. Change only the pieces that differ, normally the internal DNS binding or a VPN-bound direct proxy.
+4. Use `scripts/switch-clash-scene.ps1` with your own paths. It copies the three files and verifies SHA-256 equality; it does not disconnect VPN, edit the subscription, or reload the core.
+5. Reload the Clash Verge profile or restart the core after switching. Verify the generated runtime configuration and fresh logs before treating the scene as active.
+
+Example layout:
+
+```text
+C:\NetworkProfiles\clash-scenes\
+  home\
+    Script.js
+    Merge.yaml
+    dns_config.yaml
+  office\
+    Script.js
+    Merge.yaml
+    dns_config.yaml
+```
+
+Dry-run auto selection first:
+
+```powershell
+.\scripts\switch-clash-scene.ps1 -Scene auto `
+  -SnapshotRoot 'C:\NetworkProfiles\clash-scenes' `
+  -RuntimeRoot "$env:APPDATA\io.github.clash-verge-rev.clash-verge-rev" `
+  -VpnAdapterName 'Your VPN Adapter Name' -WhatIf
+```
+
+Then remove `-WhatIf` to apply. `auto` chooses `home` only when the named VPN adapter is `Up`; otherwise it chooses `office`. Use explicit `-Scene home` or `-Scene office` whenever adapter status is ambiguous.
+
+Do not put generated subscription files, subscription URLs, node definitions, credentials, private DNS names, or company domains into a shared scene template.
 
 ## Common Mistakes
 
@@ -153,6 +192,7 @@ If the machine moves between office LAN and home VPN, keep both patterns availab
 - Force a public subdomain to an external DNS server even though the internal DNS already returns the correct public record. This often looks cleaner on paper but can fail inside corporate networks or under TUN.
 - Add a top-level `proxies:` block in a Clash Verge merge fragment without checking how it merges. This can replace the subscription proxy list in `clash-verge-check.yaml`, empty the `url-test` group `自动`, and trigger `proxy group[0]: 🔄 自动: 'use' or 'proxies' missing`.
 - Assume TUN `DIRECT` means the request follows the same system path as TUN off. Under Mihomo it still means Clash is doing a direct outbound dial, which may follow the wrong interface unless DNS and interface binding are both correct.
+- Copy a full generated `clash-verge.yaml` between scenes. It can contain subscription-generated or private data and may be regenerated by Clash Verge. Switch only the reviewed customization files, then reload.
 
 ## References
 

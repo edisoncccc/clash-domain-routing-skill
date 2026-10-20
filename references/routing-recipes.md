@@ -12,7 +12,7 @@ dns:
     - "local-portal.example"
   nameserver-policy:
     "+.local-portal.example":
-      - 10.1.54.50
+      - 192.0.2.53
 
 rules:
   - DOMAIN-SUFFIX,local-portal.example,DIRECT
@@ -24,13 +24,15 @@ Why it works:
 - `fake-ip-filter` prevents Clash from returning fake IPs for the domain.
 - `nameserver-policy` forces the right DNS server for split-horizon or internal records.
 
+`192.0.2.53` is an RFC 5737 documentation address. Replace it with the reachable internal DNS server; do not use it as a real resolver.
+
 If the target DNS server is only reachable through a VPN or a specific interface, bind it explicitly:
 
 ```yaml
 dns:
   nameserver-policy:
     "+.local-portal.example":
-      - "10.1.54.50#OpenVPN Data Channel Offload"
+      - "192.0.2.53#Your VPN Adapter Name"
 ```
 
 Use this when TUN-off access works but TUN-on access still fails even after adding `DIRECT`.
@@ -43,7 +45,7 @@ If the same laptop alternates between office and home, do not leave the VPN-boun
 dns:
   nameserver-policy:
     "+.local-portal.example":
-      - 10.1.54.50
+      - 192.0.2.53
 
 rules:
   - DOMAIN-SUFFIX,local-portal.example,DIRECT
@@ -55,7 +57,7 @@ rules:
 dns:
   nameserver-policy:
     "+.local-portal.example":
-      - "10.1.54.50#OpenVPN Data Channel Offload"
+      - "192.0.2.53#Your VPN Adapter Name"
 
 rules:
   - DOMAIN-SUFFIX,local-portal.example,DIRECT
@@ -121,6 +123,42 @@ If that happens:
 2. Check whether the merge layer replaced the full `proxies:` array instead of appending behavior.
 3. Remove the overriding fragment and regenerate the check config.
 
+## Reusable Home/Office Scene Workflow
+
+Use two snapshots when office LAN and home VPN require different interface-bound DNS or direct egress. Keep the snapshots private if they contain corporate domains, DNS servers, adapter names, or subscription configuration.
+
+Recommended snapshot contents:
+
+```text
+clash-scenes/
+  home/
+    Script.js
+    Merge.yaml
+    dns_config.yaml
+  office/
+    Script.js
+    Merge.yaml
+    dns_config.yaml
+```
+
+Recommended split:
+
+- Keep the same internal-domain `DIRECT` rules in both scenes.
+- Office: use the reachable internal DNS directly, for example `192.0.2.53`.
+- Home: bind that DNS to the VPN adapter only if the VPN must carry the DNS request, for example `"192.0.2.53#Your VPN Adapter Name"`.
+- Add an interface-bound `direct` proxy only after logs prove plain `DIRECT` selects the wrong egress interface under TUN.
+
+The included PowerShell helper intentionally copies only `Script.js`, `Merge.yaml`, and `dns_config.yaml`:
+
+```powershell
+.\scripts\switch-clash-scene.ps1 -Scene auto `
+  -SnapshotRoot 'C:\NetworkProfiles\clash-scenes' `
+  -RuntimeRoot "$env:APPDATA\io.github.clash-verge-rev.clash-verge-rev" `
+  -VpnAdapterName 'Your VPN Adapter Name' -WhatIf
+```
+
+After confirming the selected scene, remove `-WhatIf`. The helper validates all source files before copying and verifies hashes afterward. It does not reload Clash Verge, control OpenVPN, call the Mihomo controller API, or copy generated subscription files. Reload the profile/core manually, then verify the merged configuration and a fresh route log.
+
 ## Verification Checklist
 
 1. Read the merged runtime config.
@@ -130,3 +168,4 @@ If that happens:
 5. Re-read the latest sidecar or core log and confirm the expected match.
 6. If the machine changes network scenes often, verify whether the VPN adapter is actually connected before trusting any interface-bound rule.
 7. If a public subdomain fails only after adding a host-specific DNS override, test the same host directly against the internal DNS server before keeping that override.
+8. For scene switching, verify the copied customization-file hashes and then reload the profile/core. Do not rely on generated-config hashes because Clash Verge can regenerate those files.
