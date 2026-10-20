@@ -1,26 +1,17 @@
 [CmdletBinding(SupportsShouldProcess)]
 param(
-  [ValidateSet('auto', 'home', 'office')]
-  [string]$Scene = 'auto',
+  [Parameter(Mandatory)]
+  [ValidateSet('home', 'office')]
+  [string]$Scene,
 
   [Parameter(Mandatory)]
   [string]$SnapshotRoot,
 
   [Parameter(Mandatory)]
-  [string]$RuntimeRoot,
-
-  [string]$VpnAdapterName
+  [string]$RuntimeRoot
 )
 
 $ErrorActionPreference = 'Stop'
-
-if ($Scene -eq 'auto') {
-  if ([string]::IsNullOrWhiteSpace($VpnAdapterName)) {
-    throw 'Specify -VpnAdapterName when using -Scene auto.'
-  }
-  $adapter = Get-NetAdapter -Name $VpnAdapterName -ErrorAction SilentlyContinue
-  $Scene = if ($adapter -and $adapter.Status -eq 'Up') { 'home' } else { 'office' }
-}
 
 $sourceRoot = Join-Path $SnapshotRoot $Scene
 $files = @{

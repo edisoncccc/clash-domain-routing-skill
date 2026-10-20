@@ -60,16 +60,16 @@ Use this when a laptop uses office LAN sometimes and a home VPN at other times.
 2. Start with a dry run:
 
 ```powershell
-.\scripts\switch-clash-scene.ps1 -Scene auto `
+.\scripts\switch-clash-scene.ps1 -Scene home `
   -SnapshotRoot 'C:\NetworkProfiles\clash-scenes' `
   -RuntimeRoot "$env:APPDATA\io.github.clash-verge-rev.clash-verge-rev" `
-  -VpnAdapterName 'Your VPN Adapter Name' -WhatIf
+  -WhatIf
 ```
 
-3. Remove `-WhatIf` to apply. `auto` uses `home` only when the named VPN adapter is `Up`; otherwise it uses `office`.
+3. Remove `-WhatIf` to apply. Select `home` only after confirming the VPN is connected; select `office` on the office LAN.
 4. Reload the Clash Verge profile or restart the core. The script deliberately does not reload the core, change the VPN connection, or call the Mihomo controller API.
 
-Use `-Scene home` or `-Scene office` explicitly when automatic adapter detection is uncertain. Do not upload scene snapshots containing company domains, private DNS addresses, subscriptions, credentials, or generated `clash-verge.yaml` files.
+The script intentionally requires `-Scene home` or `-Scene office`; do not attach it to VPN connection events or use it to trigger a Clash Verge reload. Do not upload scene snapshots containing company domains, private DNS addresses, subscriptions, credentials, or generated `clash-verge.yaml` files.
 The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentation-only and must be replaced with the local internal DNS server.
 
 ### Notes
@@ -81,7 +81,7 @@ The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentati
 - If one internal DNS server already returns the correct public answer for some hosts and the internal answer for others under the same parent domain, prefer that single DNS source instead of forcing public hosts to an external resolver.
 - In corporate networks, hardcoded public resolvers such as `223.6.6.6` may be reachable in theory but still fail in practice from Mihomo under TUN.
 - In Clash Verge merge fragments, be careful with top-level `proxies:` overrides; they can break generated groups such as `自动` in `clash-verge-check.yaml`.
-- The scene helper is portable only after replacing the sample paths and VPN adapter name with local values. Keep private scene snapshots outside this public repository.
+- The scene helper is portable only after replacing the sample paths with local values. Keep private scene snapshots outside this public repository.
 
 ## 中文
 
@@ -143,16 +143,16 @@ The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentati
 2. 先做不修改文件的预演：
 
 ```powershell
-.\scripts\switch-clash-scene.ps1 -Scene auto `
+.\scripts\switch-clash-scene.ps1 -Scene home `
   -SnapshotRoot 'C:\NetworkProfiles\clash-scenes' `
   -RuntimeRoot "$env:APPDATA\io.github.clash-verge-rev.clash-verge-rev" `
-  -VpnAdapterName '你的 VPN 网卡名称' -WhatIf
+  -WhatIf
 ```
 
-3. 确认选择的场景正确后，去掉 `-WhatIf` 执行切换。`auto` 仅在指定 VPN 网卡状态为 `Up` 时选择 `home`，否则选择 `office`。
+3. 确认场景正确后，去掉 `-WhatIf` 执行切换。确认 VPN 已连接后才选择 `home`；在办公室内网时选择 `office`。
 4. 在 Clash Verge 中重新加载配置或重启核心。脚本刻意不会重载核心、断开/连接 VPN，也不会调用 Mihomo controller API。
 
-自动识别不确定时，用 `-Scene home` 或 `-Scene office` 显式指定。不要把包含公司域名、私有 DNS 地址、订阅、凭据或生成的 `clash-verge.yaml` 的快照上传到本公开仓库。
+脚本刻意要求显式传入 `-Scene home` 或 `-Scene office`；不要把它挂到 VPN 连接事件上，也不要用它触发 Clash Verge 重载。不要把包含公司域名、私有 DNS 地址、订阅、凭据或生成的 `clash-verge.yaml` 的快照上传到本公开仓库。
 仓库其他位置出现的 `192.0.2.53` 是文档保留地址，必须替换成自己网络中实际可用的内网 DNS。
 
 ### 说明
@@ -164,4 +164,4 @@ The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentati
 - 如果同一个内网 DNS 已经能对同一父域下的不同主机分别返回“公网答案”和“内网答案”，优先统一使用这个 DNS，不要再给公网主机单独硬编码外部解析器。
 - 在公司网络里，像 `223.6.6.6` 这样的公网 DNS 即使看起来可用，也可能在 Mihomo + TUN 的实际查询路径里失效。
 - 在 Clash Verge 的 merge 片段里，要小心顶层 `proxies:` 覆盖；它可能把 `clash-verge-check.yaml` 里的 `自动` 组搞坏。
-- 场景脚本只有在把示例路径和 VPN 网卡名称换成本机值后才可直接使用；私有场景快照应保存在公开仓库之外。
+- 场景脚本只有在把示例路径换成本机值后才可直接使用；私有场景快照应保存在公开仓库之外。

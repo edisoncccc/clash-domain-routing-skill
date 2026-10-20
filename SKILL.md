@@ -153,7 +153,7 @@ Use scenes when the same internal domain needs different DNS/interface behavior 
 1. Create `home` and `office` snapshot folders outside the Clash Verge runtime directory.
 2. In each snapshot, keep only the reviewed customization files: `Script.js`, `Merge.yaml`, and `dns_config.yaml`.
 3. Keep `DIRECT` rules consistent across both scenes. Change only the pieces that differ, normally the internal DNS binding or a VPN-bound direct proxy.
-4. Use `scripts/switch-clash-scene.ps1` with your own paths. It copies the three files and verifies SHA-256 equality; it does not disconnect VPN, edit the subscription, or reload the core.
+4. Use `scripts/switch-clash-scene.ps1` with an explicit `home` or `office` selection. It copies the three files and verifies SHA-256 equality; it does not disconnect VPN, edit the subscription, or reload the core.
 5. Reload the Clash Verge profile or restart the core after switching. Verify the generated runtime configuration and fresh logs before treating the scene as active.
 
 Example layout:
@@ -170,16 +170,16 @@ C:\NetworkProfiles\clash-scenes\
     dns_config.yaml
 ```
 
-Dry-run auto selection first:
+Dry-run the intended scene first:
 
 ```powershell
-.\scripts\switch-clash-scene.ps1 -Scene auto `
+.\scripts\switch-clash-scene.ps1 -Scene home `
   -SnapshotRoot 'C:\NetworkProfiles\clash-scenes' `
   -RuntimeRoot "$env:APPDATA\io.github.clash-verge-rev.clash-verge-rev" `
-  -VpnAdapterName 'Your VPN Adapter Name' -WhatIf
+  -WhatIf
 ```
 
-Then remove `-WhatIf` to apply. `auto` chooses `home` only when the named VPN adapter is `Up`; otherwise it chooses `office`. Use explicit `-Scene home` or `-Scene office` whenever adapter status is ambiguous.
+Then remove `-WhatIf` to apply. Choose `-Scene home` only after confirming the VPN is connected; choose `-Scene office` on the office LAN. Do not trigger this script automatically from VPN connection events or bind it to a Clash Verge core reload.
 
 Do not put generated subscription files, subscription URLs, node definitions, credentials, private DNS names, or company domains into a shared scene template.
 

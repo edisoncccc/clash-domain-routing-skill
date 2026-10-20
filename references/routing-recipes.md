@@ -151,13 +151,13 @@ Recommended split:
 The included PowerShell helper intentionally copies only `Script.js`, `Merge.yaml`, and `dns_config.yaml`:
 
 ```powershell
-.\scripts\switch-clash-scene.ps1 -Scene auto `
+.\scripts\switch-clash-scene.ps1 -Scene home `
   -SnapshotRoot 'C:\NetworkProfiles\clash-scenes' `
   -RuntimeRoot "$env:APPDATA\io.github.clash-verge-rev.clash-verge-rev" `
-  -VpnAdapterName 'Your VPN Adapter Name' -WhatIf
+  -WhatIf
 ```
 
-After confirming the selected scene, remove `-WhatIf`. The helper validates all source files before copying and verifies hashes afterward. It does not reload Clash Verge, control OpenVPN, call the Mihomo controller API, or copy generated subscription files. Reload the profile/core manually, then verify the merged configuration and a fresh route log.
+After confirming the intended explicit scene, remove `-WhatIf`. The helper validates all source files before copying and verifies hashes afterward. It does not reload Clash Verge, control OpenVPN, call the Mihomo controller API, or copy generated subscription files. Do not attach it to VPN connection events. Reload the profile/core manually, then verify the merged configuration and a fresh route log.
 
 ## Verification Checklist
 
