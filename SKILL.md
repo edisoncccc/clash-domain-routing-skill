@@ -150,6 +150,19 @@ If the machine moves between office LAN and home VPN, keep both patterns availab
 
 Use scenes when the same internal domain needs different DNS/interface behavior on office LAN and home VPN. This is a configuration deployment problem, not a rule-order workaround.
 
+### Agent Adaptation and Authorization
+
+Treat the included script and all example values as a reference implementation, not a command to run verbatim on another computer.
+
+Before changing a live Clash Verge runtime directory, the agent must:
+
+1. Inspect the local merged configuration, runtime location, profile merge behavior, VPN requirements, and the user's intended `home`/`office` meaning.
+2. Propose the local snapshot layout and the exact files to switch. Do not copy subscription-generated files or infer private DNS, adapter names, domains, or proxy groups from this skill.
+3. Run the script with `-WhatIf` and show the selected scene and target files.
+4. Obtain the user's explicit approval before removing `-WhatIf` or modifying live runtime files.
+
+The script is deliberately limited: it does not reload Clash Verge, control VPN, or call the Mihomo controller API. Keep those actions separate and only perform them when the user requests them.
+
 1. Create `home` and `office` snapshot folders outside the Clash Verge runtime directory.
 2. In each snapshot, keep only the reviewed customization files: `Script.js`, `Merge.yaml`, and `dns_config.yaml`.
 3. Keep `DIRECT` rules consistent across both scenes. Change only the pieces that differ, normally the internal DNS binding or a VPN-bound direct proxy.

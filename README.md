@@ -46,11 +46,11 @@ It covers:
 
 Recommended prompt:
 
-> 使用 `$clash-domain-routing`，来源是 `https://github.com/edisoncccc/clash-domain-routing-skill`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过日志验证是否生效。
+> 使用 `$clash-domain-routing`，来源是 `https://github.com/edisoncccc/clash-domain-routing-skill`，先检查我的 Clash Verge 实际配置、网络场景和 VPN 需求，再给出适合本机的路由与 home/office 场景切换方案。把仓库脚本和示例当作参考实现：先展示 `-WhatIf` 预演和拟修改文件，获得我的确认后才修改运行时配置或重载核心。
 
 If the skill is already installed locally, this shorter form is also fine:
 
-> 使用 `$clash-domain-routing`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过日志验证是否生效。
+> 使用 `$clash-domain-routing`，先检查我的 Clash Verge 实际配置、网络场景和 VPN 需求，再给出适合本机的路由与 home/office 场景切换方案。把仓库脚本和示例当作参考实现：先展示 `-WhatIf` 预演和拟修改文件，获得我的确认后才修改运行时配置或重载核心。
 
 ### Home / Office Scene Switching
 
@@ -71,6 +71,10 @@ Use this when a laptop uses office LAN sometimes and a home VPN at other times.
 
 The script intentionally requires `-Scene home` or `-Scene office`; do not attach it to VPN connection events or use it to trigger a Clash Verge reload. Do not upload scene snapshots containing company domains, private DNS addresses, subscriptions, credentials, or generated `clash-verge.yaml` files.
 The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentation-only and must be replaced with the local internal DNS server.
+
+### For AI Agents
+
+This repository provides a reference implementation, not a universal executable configuration. Before changing a live machine, an agent should inspect the local Clash Verge layout and the user's actual home/office definitions, propose the private snapshots and exact target files, show a `-WhatIf` preview, and obtain explicit approval before applying or reloading anything.
 
 ### Notes
 
@@ -129,11 +133,11 @@ The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentati
 
 推荐写法：
 
-> 使用 `$clash-domain-routing`，来源是 `https://github.com/edisoncccc/clash-domain-routing-skill`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过日志验证是否生效。
+> 使用 `$clash-domain-routing`，来源是 `https://github.com/edisoncccc/clash-domain-routing-skill`，先检查我的 Clash Verge 实际配置、网络场景和 VPN 需求，再给出适合本机的路由与 home/office 场景切换方案。把仓库脚本和示例当作参考实现：先展示 `-WhatIf` 预演和拟修改文件，获得我的确认后才修改运行时配置或重载核心。
 
 如果这个 skill 已经装在本地，也可以直接发简写版：
 
-> 使用 `$clash-domain-routing`，帮我配置 Clash Verge：让一个域名在开启 TUN 时保持直连，同时让另一个指定网站固定走我的代理组。顺便检查我是否还需要 `fake-ip-filter` 或 `nameserver-policy`，然后给出准确的配置片段，以及如何通过日志验证是否生效。
+> 使用 `$clash-domain-routing`，先检查我的 Clash Verge 实际配置、网络场景和 VPN 需求，再给出适合本机的路由与 home/office 场景切换方案。把仓库脚本和示例当作参考实现：先展示 `-WhatIf` 预演和拟修改文件，获得我的确认后才修改运行时配置或重载核心。
 
 ### Office / Home 场景切换
 
@@ -154,6 +158,10 @@ The DNS address shown elsewhere in this repository, `192.0.2.53`, is documentati
 
 脚本刻意要求显式传入 `-Scene home` 或 `-Scene office`；不要把它挂到 VPN 连接事件上，也不要用它触发 Clash Verge 重载。不要把包含公司域名、私有 DNS 地址、订阅、凭据或生成的 `clash-verge.yaml` 的快照上传到本公开仓库。
 仓库其他位置出现的 `192.0.2.53` 是文档保留地址，必须替换成自己网络中实际可用的内网 DNS。
+
+### 给 AI Agent 的使用边界
+
+本仓库提供的是参考实现，不是对所有电脑都可直接执行的配置。Agent 在修改真实机器前，应先检查本机 Clash Verge 的目录与合并方式、确认用户实际的 home/office 定义，提出私有快照和拟修改文件，展示 `-WhatIf` 预演，并在获得用户明确确认后才执行复制或重载。
 
 ### 说明
 

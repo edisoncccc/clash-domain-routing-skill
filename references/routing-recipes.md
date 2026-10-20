@@ -127,6 +127,8 @@ If that happens:
 
 Use two snapshots when office LAN and home VPN require different interface-bound DNS or direct egress. Keep the snapshots private if they contain corporate domains, DNS servers, adapter names, or subscription configuration.
 
+For an AI agent, this workflow is a reference pattern rather than an imperative deployment command. The agent should first inspect the local Clash Verge merge/runtime layout, ask what the user's `home` and `office` scenes mean, and propose a private snapshot layout. It must show a `-WhatIf` result and receive explicit approval before copying to a live runtime directory. Never infer or copy private DNS servers, corporate domains, proxy groups, adapter names, subscription URLs, or generated configuration files from this repository.
+
 Recommended snapshot contents:
 
 ```text
